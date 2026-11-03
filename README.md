@@ -20,8 +20,9 @@ copia los bytes al robot sin mirarlos.
 - **PKI** (`pki/`): CA propia y certificados creados con OpenSSL.
 
 Documentos de la entrega: [`docs/diseno.md`](docs/diseno.md) (E2: conexiones, hilos y cierres) y
-[`docs/E1_pki.md`](docs/E1_pki.md) (E1: registro de la PKI, borrador). Las decisiones tomadas
-están al final de este README.
+[`docs/E1_pki.md`](docs/E1_pki.md) (E1: registro de la PKI, borrador). Para entender el código
+línea a línea: [`docs/guia_codigo.md`](docs/guia_codigo.md). Las decisiones tomadas están al
+final de este README.
 
 ---
 
@@ -53,6 +54,7 @@ Practica2TLS/
 ├── docs/
 │   ├── diseno.md            E2
 │   ├── E1_pki.md            E1 (borrador)
+│   ├── guia_codigo.md       guía para leer el código, con recorridos y ejercicios
 │   └── captura_ejemplo.pcapng   captura de ejemplo (no es la de la demostración)
 └── material/                wheel del UR3e para PyBullet (la misma de la práctica de TCP/IP)
 ```
