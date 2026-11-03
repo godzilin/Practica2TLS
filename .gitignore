@@ -1,0 +1,11 @@
+# Secretos: nunca al repo ni a la entrega (E3: "sin claves privadas, sin .p12 y sin contraseñas")
+pki/ca-privado/
+*.key
+*.p12
+claves*
+
+# Generados
+*.csr
+*.log
+__pycache__/
+.venv/

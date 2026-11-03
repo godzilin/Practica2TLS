@@ -1,0 +1,14 @@
+{
+    "ip_escucha": "10.172.18.70",
+    "rutas": [
+        {"escucha": 3000, "destino": "10.172.18.73", "puerto_destino": 30001},
+        {"escucha": 3001, "destino": "10.172.18.73", "puerto_destino": 29999}
+    ],
+    "autorizados": ["cliente-a"],
+    "ca": "../pki/publico/ca.crt",
+    "certificado": "../pki/pasarela/pasarela.crt",
+    "clave": "../pki/pasarela/pasarela.key",
+    "registro": "pasarela.log",
+    "tiempo_handshake": 10,
+    "tiempo_robot": 5
+}
