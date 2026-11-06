@@ -9,3 +9,7 @@ claves*
 *.log
 __pycache__/
 .venv/
+
+# Paquetes para llevar a otro PC: llevan claves privadas
+PC_*/
+*.zip

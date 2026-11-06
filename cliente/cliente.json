@@ -1,7 +1,7 @@
 {
     "modo": "pasarela",
     "pasarela": "10.172.18.70",
-    "puertos": {"30001": 3000, "29999": 3001},
+    "puertos": {"30001": 3000, "29999": 3001, "30003": 3002},
     "ca": "../pki/publico/ca.crt",
     "certificado": "../pki/cliente-a/cliente-a.crt",
     "clave": "../pki/cliente-a/cliente-a.key"

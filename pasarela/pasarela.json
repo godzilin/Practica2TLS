@@ -2,9 +2,10 @@
     "ip_escucha": "10.172.18.70",
     "rutas": [
         {"escucha": 3000, "destino": "10.172.18.73", "puerto_destino": 30001},
-        {"escucha": 3001, "destino": "10.172.18.73", "puerto_destino": 29999}
+        {"escucha": 3001, "destino": "10.172.18.73", "puerto_destino": 29999},
+        {"escucha": 3002, "destino": "10.172.18.73", "puerto_destino": 30003}
     ],
-    "autorizados": ["cliente-a"],
+    "autorizados": ["cliente-a","cliente-b"],
     "ca": "../pki/publico/ca.crt",
     "certificado": "../pki/pasarela/pasarela.crt",
     "clave": "../pki/pasarela/pasarela.key",
@@ -12,3 +13,4 @@
     "tiempo_handshake": 10,
     "tiempo_robot": 5
 }
+

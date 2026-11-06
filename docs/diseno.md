@@ -9,7 +9,9 @@
  │ cliente-a.crt│   10.172.18.70:3000    │ pasarela.crt │   .73:30001         │  (URSim .73) │
  │ primaria.py  │══ TLS ═══════════════> │  SAN = IP de │── TCP ────────────> │              │
  │ ensenar_...  │   10.172.18.70:3001    │  la pasarela │   .73:29999         │              │
- └──────────────┘                        └──────────────┘   (dashboard)       └──────────────┘
+ │ tiempo_real  │══ TLS ═══════════════> │              │── TCP ────────────> │              │
+ │              │   10.172.18.70:3002    │              │   .73:30003         │              │
+ └──────────────┘                        └──────────────┘                     └──────────────┘
    presenta cliente-a.crt                 exige certificado, valida contra
    valida pasarela.crt contra ca.crt      ca.crt, comprueba CN en la lista
    y la IP contra la SAN                  de autorizados; NO interpreta los bytes
@@ -18,7 +20,8 @@
 Cada línea de `rutas` en `pasarela.json` es un puerto de escucha de la pasarela unido a un
 puerto del robot. La obligatoria es `3000 -> 30001` (interfaz primaria: estado y órdenes
 URScript). `3001 -> 29999` (dashboard) la usa `ensenar_reproducir.py` para desbloquear una
-parada de protección y `medir.py` para medir tiempos.
+parada de protección y `medir.py` para medir tiempos. `3002 -> 30003` (interfaz de tiempo
+real, 500 paquetes/s) la usa `tiempo_real.py`.
 
 ## Hilos
 

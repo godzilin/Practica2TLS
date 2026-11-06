@@ -7,7 +7,7 @@ Al final enseña el registro de la pasarela.
 
     PASARELA_CLAVE=... CLIENTE_CLAVE=... CLIENTEB_CLAVE=... python pruebas/prueba_pasarela.py
 
-Necesita el cable puesto: la pasarela escucha en la IP de su SAN (10.172.18.70).
+Necesita el cable puesto: la pasarela escucha en la IP de su SAN (ip_escucha de pasarela.json).
 """
 
 import asyncio
@@ -25,7 +25,7 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
 PKI = RAIZ / "pki"
-IP = "10.172.18.70"
+IP = json.loads((RAIZ / "pasarela/pasarela.json").read_text(encoding="utf-8"))["ip_escucha"]   # la de la SAN
 ECO, BUENA, SIN_ROBOT = 3100, 3101, 3102        # puertos de la pasarela de prueba
 TIEMPO_HANDSHAKE = 2
 
@@ -97,7 +97,7 @@ def cerrada(tls):
         return tls.recv(1024) == b""
     except ssl.SSLError:
         return True
-    except TimeoutError:
+    except socket.timeout:
         return False
 
 

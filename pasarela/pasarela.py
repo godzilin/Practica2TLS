@@ -103,7 +103,7 @@ class Pasarela:
         while not self.parar.is_set():
             try:
                 conexion, (ip, _) = servidor.accept()
-            except TimeoutError:
+            except socket.timeout:          # = TimeoutError en Python 3.10+; así vale también en 3.8 y 3.9
                 continue
             except OSError:                 # socket de escucha cerrado
                 break
@@ -166,7 +166,7 @@ class Pasarela:
                 destino, nombre = otro[origen]
                 try:
                     datos = origen.recv(TAM_RECV)
-                except TimeoutError:        # select vio bytes pero aún no un registro TLS entero
+                except socket.timeout:      # select vio bytes pero aún no un registro TLS entero
                     continue
                 except OSError as e:
                     return f"error al leer del {nombre}: {e}"

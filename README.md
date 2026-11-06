@@ -6,9 +6,10 @@ le hablan por **TLS 1.3 con autenticación mutua**. La pasarela comprueba quién
 copia los bytes al robot sin mirarlos.
 
 ```
- cliente (primaria.py, ensenar_reproducir.py)          pasarela.py                    robot / URSim
+ cliente (primaria.py, ensenar_reproducir.py...)       pasarela.py                    robot / URSim
    transporte.conectar()  ══ TLS 1.3, mTLS ══>  10.172.18.70:3000  ── TCP en claro ──>  .73:30001
                           ══ TLS 1.3, mTLS ══>  10.172.18.70:3001  ── TCP en claro ──>  .73:29999
+                          ══ TLS 1.3, mTLS ══>  10.172.18.70:3002  ── TCP en claro ──>  .73:30003
         tramo C1: cifrado, cliente y pasarela autenticados    tramo C2: en claro (como antes)
 ```
 
@@ -21,7 +22,8 @@ copia los bytes al robot sin mirarlos.
 
 Documentos de la entrega: [`docs/diseno.md`](docs/diseno.md) (E2: conexiones, hilos y cierres) y
 [`docs/E1_pki.md`](docs/E1_pki.md) (E1: registro de la PKI, borrador). Para entender el código
-línea a línea: [`docs/guia_codigo.md`](docs/guia_codigo.md). Las decisiones tomadas están al
+línea a línea: [`docs/guia_codigo.md`](docs/guia_codigo.md). Para llevarlo a otro PC o cambiar
+de IP: [`docs/cambio_de_pc.md`](docs/cambio_de_pc.md). Las decisiones tomadas están al
 final de este README.
 
 ---
@@ -39,6 +41,7 @@ Practica2TLS/
 │   ├── cliente.json         su configuración (modo, IP de la pasarela, puertos, certificados)
 │   ├── robots.json          IP del robot (la misma que en la práctica de TCP/IP)
 │   ├── primaria.py          visualizador de la práctica de TCP/IP (1 línea cambiada)
+│   ├── tiempo_real.py       visualizador por la interfaz de tiempo real, 30003 (1 línea cambiada)
 │   ├── ensenar_reproducir.py  enseñar y reproducir (1 línea cambiada, 2 sitios)
 │   └── medir.py             tiempos de respuesta directo vs pasarela (C10)
 ├── pruebas/
@@ -55,6 +58,7 @@ Practica2TLS/
 │   ├── diseno.md            E2
 │   ├── E1_pki.md            E1 (borrador)
 │   ├── guia_codigo.md       guía para leer el código, con recorridos y ejercicios
+│   ├── cambio_de_pc.md      qué copiar y qué cambiar al mover el proyecto o cambiar de IP
 │   └── captura_ejemplo.pcapng   captura de ejemplo (no es la de la demostración)
 └── material/                wheel del UR3e para PyBullet (la misma de la práctica de TCP/IP)
 ```
@@ -83,6 +87,7 @@ python3 pasarela/pasarela.py
 # Contraseña de la clave de la pasarela:      (no se ve al escribir)
 # ... INFO Escuchando en 10.172.18.70:3000 -> 10.172.18.73:30001
 # ... INFO Escuchando en 10.172.18.70:3001 -> 10.172.18.73:29999
+# ... INFO Escuchando en 10.172.18.70:3002 -> 10.172.18.73:30003
 # ... INFO Pasarela en marcha. Autorizados: cliente-a. Ctrl+C para parar
 ```
 
@@ -121,7 +126,7 @@ se puede copiar a otro PC.
 | Campo | Para qué |
 |---|---|
 | `ip_escucha` | IP de la pasarela. Solo se escucha en esa IP (P1), y tiene que ser la de la SAN de su certificado. |
-| `rutas` | Lista de `{"escucha", "destino", "puerto_destino"}`: cada puerto de la pasarela va a un puerto del robot. `3000 -> 30001` es la obligatoria; `3001 -> 29999` (dashboard) la usan `ensenar_reproducir.py` y `medir.py`. |
+| `rutas` | Lista de `{"escucha", "destino", "puerto_destino"}`: cada puerto de la pasarela va a un puerto del robot. `3000 -> 30001` es la obligatoria; `3001 -> 29999` (dashboard) la usan `ensenar_reproducir.py` y `medir.py`; `3002 -> 30003` (tiempo real) la usa `tiempo_real.py`. |
 | `autorizados` | CN de los clientes que pueden pasar (P7). `cliente-b` no está. |
 | `ca`, `certificado`, `clave` | Ficheros PEM de la PKI. |
 | `registro` | Fichero de registro (P9). |
@@ -137,7 +142,7 @@ prueba automática).
 |---|---|
 | `modo` | `"pasarela"` (TLS) o `"directo"` (TCP al robot, C7). |
 | `pasarela` | IP de la pasarela: la de la SAN de su certificado (no `127.0.0.1` ni un nombre). |
-| `puertos` | Puerto del robot -> puerto de la pasarela: `{"30001": 3000, "29999": 3001}`. Así los scripts siguen usando sus constantes `PUERTO = 30001` y `PUERTO_DASHBOARD = 29999`. |
+| `puertos` | Puerto del robot -> puerto de la pasarela: `{"30001": 3000, "29999": 3001, "30003": 3002}`. Así los scripts siguen usando sus constantes `PUERTO = 30001`, `PUERTO = 30003` y `PUERTO_DASHBOARD = 29999`. |
 | `ca`, `certificado`, `clave` | Ficheros PEM del cliente (C1). |
 
 `cliente/robots.json` es el de la práctica de TCP/IP: solo se usa la IP del robot en modo directo.
@@ -339,9 +344,9 @@ certificado se ve como registros cifrados seguidos del cierre TCP, no como una a
    puerto del robot se traduce al de la pasarela con `puertos` en `cliente.json`, así que las
    constantes `PUERTO = 30001` de los scripts siguen valiendo.
 3. **Rutas en la pasarela.** Un puerto de la pasarela por cada puerto del robot que se usa
-   (3000 -> 30001, 3001 -> 29999). El enunciado solo pide el 3000; el 3001 hace falta porque
-   `ensenar_reproducir.py` también habla con el dashboard. No se añadió el 30003
-   (`tiempo_real.py`) porque no se usa en la demostración: sería una línea más en los dos JSON.
+   (3000 -> 30001, 3001 -> 29999, 3002 -> 30003). El enunciado solo pide el 3000; el 3001 hace
+   falta porque `ensenar_reproducir.py` también habla con el dashboard, y el 3002 porque
+   `tiempo_real.py` usa la interfaz de tiempo real (500 paquetes/s).
 4. **Un hilo por cliente con `select()`, no dos.** Ver `docs/diseno.md`: con dos hilos por
    cliente (uno por sentido), la prueba de estrés falló a veces con `[Errno 11]` porque un
    `SSLSocket` de Python no admite que un hilo lea mientras otro escribe. Con `select()` cada
